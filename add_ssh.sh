@@ -18,7 +18,7 @@ fail(){
 is_private_key(){
     key_file=$1
     test -r || return 1
-    grep "BEGIN RSA PRIVATE KEY" < $key_file &>/dev/null
+    grep "PRIVATE" < $key_file &>/dev/null
 }
 
 if [ $# -lt 1 ];then
@@ -29,13 +29,15 @@ fi
 
 key_file="$1"
 is_private_key "$key_file" && key_file="${key_file}.pub"
+key_type="$( cat $key_file | cut -d ' ' -f1 | cut -d '-' -f2 )"
 key_id="$( cat $key_file | cut -d ' ' -f3 )"
 
-echo "Backup ${key_id}? (y/N)"
+echo "Backup ${key_id}, type ${key_type}? (Y/n)"
 read answer
+test -n "$answer" || answer="y"
+[[ "$answer" != [yY] ]] && fail "Exited on user request."
 
-[[ "$answer" != "y" ]] && fail "Exited on user request."
 test -d "$KEY_DIR" || mkdir -p "$KEY_DIR" || fail "Could not create directory $KEY_DIR"
-cp "$key_file" -v "$KEY_DIR/${key_id}.pub"
+cp "$key_file" -v "$KEY_DIR/${key_id}-${key_type}.pub"
 
 exit 0
