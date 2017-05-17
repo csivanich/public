@@ -36,6 +36,6 @@ read answer
 
 [[ "$answer" != "y" ]] && fail "Exited on user request."
 test -d "$KEY_DIR" || mkdir -p "$KEY_DIR" || fail "Could not create directory $KEY_DIR"
-cp "$key_file" -v "$KEY_DIR"
+cp "$key_file" -v "$KEY_DIR/${key_id}.pub"
 
 exit 0
